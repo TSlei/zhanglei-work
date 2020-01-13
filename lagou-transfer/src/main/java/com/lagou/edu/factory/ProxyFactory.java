@@ -1,10 +1,7 @@
 package com.lagou.edu.factory;
 
-import com.lagou.edu.annotation.Autowired;
 import com.lagou.edu.annotation.Service;
-import com.lagou.edu.pojo.Account;
 import com.lagou.edu.transaction.ITransaction;
-import com.lagou.edu.utils.TransactionManager;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -38,7 +35,6 @@ public class ProxyFactory {
                         ITransaction transaction = null;
                         try{
                             // 开启事务(关闭事务的自动提交)
-//                            TransactionManager.getInstance().beginTransaction();
                             transaction = (ITransaction) BeanFactoryAnno.getTransactionBean(method.getName());
                             if(transaction != null){
                                 transaction.beginTransaction();
@@ -46,24 +42,18 @@ public class ProxyFactory {
                             result = method.invoke(obj,args);
 
                             // 提交事务
-//                            TransactionManager.getInstance().commit();
                             if(transaction != null){
                                 transaction.commit();
                             }
-//                            transactionManager.commit();
                         }catch (Exception e) {
                             e.printStackTrace();
                             // 回滚事务
-//                            TransactionManager.getInstance().rollback();
                             if(transaction != null){
                                 transaction.rollback();
                             }
-//                            transactionManager.rollback();
                             // 抛出异常便于上层servlet捕获
                             throw e;
-
                         }
-
                         return result;
                     }
                 });
@@ -84,31 +74,21 @@ public class ProxyFactory {
                 ITransaction transaction = null;
                 try{
                     // 开启事务(关闭事务的自动提交)
-//                    TransactionManager.getInstance().beginTransaction();
                     transaction = (ITransaction)BeanFactoryAnno.getTransactionBean(method.getName());
                     if(transaction != null){
                         transaction.beginTransaction();
                     }
-//                    transactionManager.beginTransaction();
-
                     result = method.invoke(obj,objects);
-
                     // 提交事务
-//                    TransactionManager.getInstance().commit();
                     if(transaction != null){
                         transaction.commit();
                     }
-//                    transactionManager.commit();
                 }catch (Exception e) {
                     e.printStackTrace();
                     // 回滚事务
-//                    TransactionManager.getInstance().rollback();
-
                     if(transaction != null){
                         transaction.rollback();
                     }
-//                    transactionManager.rollback();
-
                     // 抛出异常便于上层servlet捕获
                     throw e;
 
@@ -117,4 +97,19 @@ public class ProxyFactory {
             }
         });
     }
+
+    /**
+     * 是否实现接口，选择jdk还是cglib动态代理
+     * @param obj
+     * @return
+     */
+    public Object getProxy(Object obj){
+        Class<?>[] classes = obj.getClass().getInterfaces();
+        if(classes == null || classes.length == 0){
+            return getCglibProxy(obj);
+        }else{
+            return getJdkProxy(obj);
+        }
+    }
+
 }

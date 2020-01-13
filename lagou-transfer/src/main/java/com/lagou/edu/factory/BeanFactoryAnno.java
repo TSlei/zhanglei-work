@@ -61,9 +61,6 @@ public class BeanFactoryAnno {
                         String value = service.value();
                         Object o = declaredConstructor.newInstance();
                         // 注解默认value值作为key，否则截取类名作为key
-                        if(value.equals("proxyFactory")){
-                            System.out.println("proxyFactory");
-                        }
                         if(!"".equals(value)){
                             // 存储到map中待用
                             map.put(value.toLowerCase(),o);

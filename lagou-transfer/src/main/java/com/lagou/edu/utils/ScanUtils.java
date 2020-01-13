@@ -153,18 +153,15 @@ public class ScanUtils {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0,
                         file.getName().length() - 6);
-                Class<?> clazz = null;
                 try {
                     // 添加到集合中去
                     //classes.add(Class.forName(packageName + '.' + className));
                     //经过回复同学的提醒，这里用forName有一些不好，会触发static方法，没有使用classLoader的load干净
-                    System.out.println(packageName + '.' + className);
-                    clazz = Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className);
+                    Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(packageName + '.' + className);
                     classes.add(clazz);
                 } catch (Exception e) {
                     // log.error("添加用户自定义视图类错误 找不到此类的.class文件");
-                    continue;
-//                    e.printStackTrace();
+                    e.printStackTrace();
                 }
 
             }

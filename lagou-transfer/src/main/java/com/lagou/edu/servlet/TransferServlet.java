@@ -22,7 +22,7 @@ public class TransferServlet extends HttpServlet {
 
     private ProxyFactory proxyFactory = (ProxyFactory)BeanFactoryAnno.getBean("proxyFactory");
 
-    private TransferService transferService = (TransferService)proxyFactory.getJdkProxy(BeanFactoryAnno.getBean("transferService"));
+    private TransferService transferService = (TransferService)proxyFactory.getProxy(BeanFactoryAnno.getBean("transferService"));
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
