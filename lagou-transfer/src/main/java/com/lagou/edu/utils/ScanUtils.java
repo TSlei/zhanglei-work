@@ -35,8 +35,7 @@ public class ScanUtils {
         // 定义一个枚举的集合 并进行循环来处理这个目录下的things
         Enumeration<URL> dirs;
         try {
-            dirs = Thread.currentThread().getContextClassLoader().getResources(
-                    packageDirName);
+            dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             // 循环迭代下去
             while (dirs.hasMoreElements()) {
                 // 获取下一个元素
@@ -48,6 +47,7 @@ public class ScanUtils {
                     System.err.println("file类型的扫描");
                     // 获取包的物理路径
                     String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
+                    System.out.println(filePath);
                     // 以文件的方式扫描整个包下的文件 并添加到集合中
                     findAndAddClassesInPackageByFile(packageName, filePath,
                             recursive, classes);
@@ -58,8 +58,7 @@ public class ScanUtils {
                     JarFile jar;
                     try {
                         // 获取jar
-                        jar = ((JarURLConnection) url.openConnection())
-                                .getJarFile();
+                        jar = ((JarURLConnection) url.openConnection()).getJarFile();
                         // 从此jar包 得到一个枚举类
                         Enumeration<JarEntry> entries = jar.entries();
                         // 同样的进行循环迭代
@@ -78,23 +77,17 @@ public class ScanUtils {
                                 // 如果以"/"结尾 是一个包
                                 if (idx != -1) {
                                     // 获取包名 把"/"替换成"."
-                                    packageName = name.substring(0, idx)
-                                            .replace('/', '.');
+                                    packageName = name.substring(0, idx).replace('/', '.');
                                 }
                                 // 如果可以迭代下去 并且是一个包
                                 if ((idx != -1) || recursive) {
                                     // 如果是一个.class文件 而且不是目录
-                                    if (name.endsWith(".class")
-                                            && !entry.isDirectory()) {
+                                    if (name.endsWith(".class") && !entry.isDirectory()) {
                                         // 去掉后面的".class" 获取真正的类名
-                                        String className = name.substring(
-                                                packageName.length() + 1, name
-                                                        .length() - 6);
+                                        String className = name.substring(packageName.length() + 1, name.length() - 6);
                                         try {
                                             // 添加到classes
-                                            classes.add(Class
-                                                    .forName(packageName + '.'
-                                                            + className));
+                                            classes.add(Class.forName(packageName + '.' + className));
                                         } catch (ClassNotFoundException e) {
                                             // log
                                             // .error("添加用户自定义视图类错误 找不到此类的.class文件");
@@ -138,21 +131,17 @@ public class ScanUtils {
         File[] dirfiles = dir.listFiles(new FileFilter() {
             // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
             public boolean accept(File file) {
-                return (recursive && file.isDirectory())
-                        || (file.getName().endsWith(".class"));
+                return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
             }
         });
         // 循环所有文件
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
             if (file.isDirectory()) {
-                findAndAddClassesInPackageByFile(packageName + "."
-                                + file.getName(), file.getAbsolutePath(), recursive,
-                        classes);
+                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), recursive, classes);
             } else {
                 // 如果是java类文件 去掉后面的.class 只留下类名
-                String className = file.getName().substring(0,
-                        file.getName().length() - 6);
+                String className = file.getName().substring(0, file.getName().length() - 6);
                 try {
                     // 添加到集合中去
                     //classes.add(Class.forName(packageName + '.' + className));
